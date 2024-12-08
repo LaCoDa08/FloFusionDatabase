@@ -1,0 +1,88 @@
+CREATE TABLE `company` (
+  `companyID` int NOT NULL,
+  `companyName` varchar(255) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phoneNumber` varchar(15) DEFAULT NULL,
+  `storeHours` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`companyID`)
+);
+
+CREATE TABLE `product` (
+  `productID` int NOT NULL AUTO_INCREMENT,
+  `productName` varchar(255) DEFAULT NULL,
+  `productPrice` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`productID`)
+); 
+
+CREATE TABLE `employee` (
+  `employeeID` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) DEFAULT NULL,
+  `employeeName` varchar(255) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`employeeID`)
+);
+
+CREATE TABLE `associate` (
+  `employeeID` int NOT NULL,
+  `hourlyRate` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`employeeID`),
+  CONSTRAINT `associate_fk` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`)
+);
+
+CREATE TABLE `employee_account` (
+  `employeeID` int NOT NULL,
+  `userName` varchar(255) DEFAULT NULL,
+  `e_password` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`employeeID`),
+  CONSTRAINT `employee_account_fk` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`)
+);
+
+CREATE TABLE `inventory` (
+  `productID` int DEFAULT NULL,
+  `numberOfItemInStock` int DEFAULT NULL,
+  KEY `inventory_fk` (`productID`),
+  CONSTRAINT `inventory_fk` FOREIGN KEY (`productID`) REFERENCES `product` (`productID`)
+); 
+
+CREATE TABLE `manager` (
+  `employeeID` int NOT NULL,
+  `salary` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`employeeID`),
+  CONSTRAINT `manager_fk` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`)
+); 
+
+CREATE TABLE `time_off_requests` (
+  `requestID` int NOT NULL AUTO_INCREMENT,
+  `employeeID` int NOT NULL,
+  `startDate` date NOT NULL,
+  `endDate` date NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `status` enum('Pending','Approved','Denied') DEFAULT 'Pending',
+  PRIMARY KEY (`requestID`),
+  KEY `employeeID` (`employeeID`),
+  CONSTRAINT `time_off_requests_ibfk_1` FOREIGN KEY (`employeeID`) REFERENCES `employee_account` (`employeeID`)
+); 
+
+CREATE TABLE `transaction` (
+  `transactionID` int NOT NULL AUTO_INCREMENT,
+  `employeeID` int DEFAULT NULL,
+  `companyID` int DEFAULT NULL,
+  `itemList` varchar(1000) DEFAULT NULL,
+  `timeAndDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`transactionID`),
+  KEY `transaction_fk3` (`companyID`),
+  KEY `transaction_fk1` (`employeeID`),
+  CONSTRAINT `transaction_fk1` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`),
+  CONSTRAINT `transaction_fk3` FOREIGN KEY (`companyID`) REFERENCES `company` (`companyID`)
+); 
+
+CREATE TABLE `employee_schedule` (
+  `scheduleID` int NOT NULL AUTO_INCREMENT,
+  `employeeID` int NOT NULL,
+  `workDate` date NOT NULL,
+  `startTime` time NOT NULL,
+  `endTime` time NOT NULL,
+  PRIMARY KEY (`scheduleID`),
+  KEY `employeeID` (`employeeID`),
+  CONSTRAINT `employee_schedule_ibfk_1` FOREIGN KEY (`employeeID`) REFERENCES `employee_account` (`employeeID`)
+); 
